@@ -1,0 +1,13 @@
+{
+	"FileVersion": 3,
+	"EngineAssociation": "{E2DC9928-45E9-2477-6289-A29DE7F3A66C}",
+	"Category": "",
+	"Description": "",
+	"Modules": [
+		{
+			"Name": "ArmyOfOne",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		}
+	]
+}
