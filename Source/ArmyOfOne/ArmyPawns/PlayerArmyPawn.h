@@ -47,10 +47,10 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void ClearMapRange();
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void ShowMoveRange(AUnitPawn* unit);
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void ShowAttackRange(AUnitPawn* unit);
 
 public:

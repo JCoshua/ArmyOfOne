@@ -69,7 +69,9 @@ void APlayerArmyPawn::Tick(float DeltaTime)
 			if (SelectedUnit->CurrentState == EUnitState::SELECTED)
 				ShowMoveRange(SelectedUnit);
 			else if (SelectedUnit->CurrentState == EUnitState::MOVED)
+			{
 				ShowAttackRange(SelectedUnit);
+			}
 			ShouldUpdateRange = false;
 		}
 		else if (SelectedTile->Unit)
@@ -244,63 +246,6 @@ void APlayerArmyPawn::ClearMapRange()
 		if (map[i]->MovementMesh->GetVisibleFlag())
 			map[i]->MovementMesh->SetVisibility(false);
 	}
-}
-
-void APlayerArmyPawn::ShowMoveRange(AUnitPawn* unit)
-{
-	if (!unit)
-		return;
-
-	ClearMapRange();
-	TArray<ATileActor*> nearTile = unit->GetAllTilesInRange();
-
-	UMaterialInterface* moveMat = LoadObject<UMaterialInterface>(NULL, TEXT("MaterialInstanceConstant'/Game/Materials/MovementIndicators/MI_MovementIndicator_Blue.MI_MovementIndicator_Blue'"));
-	UMaterialInterface* attackMat = LoadObject<UMaterialInterface>(NULL, TEXT("MaterialInstanceConstant'/Game/Materials/MovementIndicators/MI_MovementIndicator_Red.MI_MovementIndicator_Red'"));
-	for (int i = 0; i < nearTile.Num(); i++)
-	{
-		nearTile[i]->MovementMesh->SetVisibility(true);
-
-		if (nearTile[i]->Unit)
-		{
-			if(nearTile[i]->Unit != unit)
-				nearTile[i]->MovementMesh->SetMaterial(0, attackMat);
-			else
-				nearTile[i]->MovementMesh->SetMaterial(0, moveMat);
-		}
-		else
-			nearTile[i]->MovementMesh->SetMaterial(0, moveMat);
-
-		TArray<ATileActor*> attackTile = unit->GetAttackableTiles(nearTile[i]);
-
-		for (int j = 0; j < attackTile.Num(); j++)
-		{
-			if (!nearTile.Contains(attackTile[j]))
-			{
-				attackTile[j]->MovementMesh->SetVisibility(true);
-				attackTile[j]->MovementMesh->SetMaterial(0, attackMat);
-			}
-		}
-	}
-}
-
-void APlayerArmyPawn::ShowAttackRange(AUnitPawn* unit)
-{
-	if (!unit)
-		return;
-
-	ClearMapRange();
-	TArray<ATileActor*> nearTile = unit->GetAttackableTiles();
-
-	UMaterialInterface* moveMat = LoadObject<UMaterialInterface>(NULL, TEXT("MaterialInstanceConstant'/Game/Materials/MovementIndicators/MI_MovementIndicator_Blue.MI_MovementIndicator_Blue'"));
-	UMaterialInterface* attackMat = LoadObject<UMaterialInterface>(NULL, TEXT("MaterialInstanceConstant'/Game/Materials/MovementIndicators/MI_MovementIndicator_Red.MI_MovementIndicator_Red'"));
-
-	for (int i = 0; i < nearTile.Num(); i++)
-	{
-		nearTile[i]->MovementMesh->SetVisibility(true);
-		nearTile[i]->MovementMesh->SetMaterial(0, attackMat);
-	}
-
-	unit->CurrentTile->MovementMesh->SetMaterial(0, moveMat);
 }
 
 void APlayerArmyPawn::TraceForActor(const FVector& start, const FVector& end, bool DrawDebugHelpers)
