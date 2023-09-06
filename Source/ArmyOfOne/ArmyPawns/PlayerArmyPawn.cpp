@@ -1,9 +1,9 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "PlayerArmyPawn.h"
 #include "HeadMountedDisplayFunctionLibrary.h"
 #include <Camera/CameraComponent.h>
+#include "GameFramework/SpringArmComponent.h"
 #include "DrawDebugHelpers.h"
 #include <ArmyOfOne/TileActor.h>
 #include <ArmyOfOne/UnitPawn.h>
@@ -13,8 +13,16 @@ APlayerArmyPawn::APlayerArmyPawn()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
+	PlayerCursor = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Cursor"));
+	RootComponent = PlayerCursor;
+
+	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
+	CameraBoom->SetupAttachment(PlayerCursor);
+	CameraBoom->TargetArmLength = 300.0f;
+	CameraBoom->bUsePawnControlRotation = true;
+
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Player Camera"));
-	Camera->SetupAttachment(RootComponent);
+	Camera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 }
 
 void APlayerArmyPawn::BeginPlay()
@@ -30,37 +38,39 @@ void APlayerArmyPawn::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 	MoveTimer += DeltaTime;
 
-	if (APlayerController* PC = Cast<APlayerController>(GetController()))
+	if (UsingMouse)
 	{
-		FVector Start, Dir, End;
-		PC->DeprojectMousePositionToWorld(Start, Dir);
-		End = Start + (Dir * 8000.0f);
-		TraceForActor(Start, End, false);
-	}
-
-	ATileActor* tile = Cast<ATileActor>(TracedActor);
-	if (tile)
-	{
-		if (SelectedTile != tile)
+		if (APlayerController* PC = Cast<APlayerController>(GetController()))
 		{
-			SelectedTile = tile;
-			ShouldUpdateRange = true;
+			FVector Start, Dir, End;
+			PC->DeprojectMousePositionToWorld(Start, Dir);
+			End = Start + (Dir * 8000.0f);
+			TraceForActor(Start, End, false);
 		}
-	}
-	else
-	{
-		AUnitPawn* unit = Cast<AUnitPawn>(TracedActor);
-		if (unit)
+
+		ATileActor* tile = Cast<ATileActor>(TracedActor);
+		if (tile)
 		{
-			if (SelectedTile != unit->CurrentTile)
+			if (SelectedTile != tile)
 			{
-				SelectedTile = unit->CurrentTile;
+				SelectedTile = tile;
 				ShouldUpdateRange = true;
 			}
-			
+		}
+		else
+		{
+			AUnitPawn* unit = Cast<AUnitPawn>(TracedActor);
+			if (unit)
+			{
+				if (SelectedTile != unit->CurrentTile)
+				{
+					SelectedTile = unit->CurrentTile;
+					ShouldUpdateRange = true;
+				}
+
+			}
 		}
 	}
-
 
 	if (ShouldUpdateRange)
 	{
@@ -192,17 +202,25 @@ void APlayerArmyPawn::SelectTile()
 				SelectedUnit->CurrentState = EUnitState::MOVED;
 			else if(SelectedUnit->IsOpposing(SelectedTile->Unit))
 			{
-				TArray<ATileActor*> nearbyTiles = SelectedUnit->GetAttackableTiles(SelectedTile);
-				ATileActor* closestTile = SelectedTile;
-
-				for (int i = 0; i < nearbyTiles.Num(); i++)
+				if (SelectedUnit->CurrentState == EUnitState::SELECTED)
 				{
-					if (AMapManager::GetSmallestDistance(SelectedUnit->CurrentTile, nearbyTiles[i]) < AMapManager::GetSmallestDistance(SelectedUnit->CurrentTile, closestTile))
-						closestTile = nearbyTiles[i];
-				}
+					TArray<ATileActor*> nearbyTiles = SelectedUnit->GetAttackableTiles(SelectedTile);
+					ATileActor* closestTile = SelectedTile;
 
-				if (AMapManager::GetSmallestDistance(SelectedUnit->CurrentTile, closestTile) <= SelectedUnit->MovementRange)
-					SelectedUnit->MoveToTile(closestTile);
+					for (int i = 0; i < nearbyTiles.Num(); i++)
+					{
+						if (AMapManager::GetSmallestDistance(SelectedUnit->CurrentTile, nearbyTiles[i]) < AMapManager::GetSmallestDistance(SelectedUnit->CurrentTile, closestTile))
+							closestTile = nearbyTiles[i];
+					}
+
+					if (AMapManager::GetSmallestDistance(SelectedUnit->CurrentTile, closestTile) <= SelectedUnit->MovementRange)
+						SelectedUnit->MoveToTile(closestTile);
+				}
+				else if (SelectedUnit->CurrentState == EUnitState::MOVED)
+				{
+					SelectedUnit->OnAttacking(SelectedTile->Unit);
+					SelectedTile->Unit = nullptr;
+				}
 			}
 		}
 		else //There is no unit currently selected.

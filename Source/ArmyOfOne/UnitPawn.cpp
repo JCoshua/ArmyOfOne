@@ -5,6 +5,8 @@
 #include "TileActor.h"
 #include "MapData/MapManager.h"
 #include "ArmyPawns/PlayerArmyPawn.h"
+#include "ItemData/WeaponActor.h"
+#include "BattleManagers/BattleManager.h"
 
 // Sets default values
 AUnitPawn::AUnitPawn()
@@ -142,8 +144,8 @@ TArray<ATileActor*> AUnitPawn::GetAttackableTiles()
 TArray<ATileActor*> AUnitPawn::GetAttackableTiles(ATileActor* tile)
 {
 	TArray<ATileActor*> ret;
-	TArray<ATileActor*> allTiles = tile->GetTilesInRange(MaxAttackRange);
-	TArray<ATileActor*> minTiles = tile->GetTilesInRange(MinAttackRange - 1);
+	TArray<ATileActor*> allTiles = tile->GetTilesInRange(1);
+	TArray<ATileActor*> minTiles = tile->GetTilesInRange(1 - 1);
 
 	for (int i = 0; i < allTiles.Num(); i++)
 	{
@@ -152,6 +154,16 @@ TArray<ATileActor*> AUnitPawn::GetAttackableTiles(ATileActor* tile)
 	}
 
 	return ret;
+}
+
+bool AUnitPawn::CanAttackUnit(AUnitPawn* target)
+{
+	AWeaponActor* weapon = dynamic_cast<AWeaponActor*>(EquippedItem);
+
+	if(!weapon)
+		return false;
+
+	return GetAttackableTiles().Contains(target->CurrentTile);
 }
 
 AMapManager* AUnitPawn::GetMap()
@@ -173,4 +185,28 @@ bool AUnitPawn::IsOpposing(AUnitPawn* target)
 bool AUnitPawn::IsOpposing()
 {
 	return 	Affiliation != EUnitSide::PLAYER && Affiliation != EUnitSide::ALLY;
+}
+
+void AUnitPawn::OnAttacking(AUnitPawn* defendingUnit)
+{
+	UBattleManager::PerformBattle(this, defendingUnit);
+}
+
+void AUnitPawn::OnDefeated(AUnitPawn* attackingPawn)
+{
+	Destroy();
+}
+
+int AUnitPawn::TakeDamage(AUnitPawn* attackingUnit, int attack, int defense)
+{
+	if (defense > attack)
+		return 0;
+
+	int dmg = attack - defense;
+
+	if (dmg < 0)
+		dmg = 0;
+
+	CurrentHealth -= dmg;
+	return dmg;
 }

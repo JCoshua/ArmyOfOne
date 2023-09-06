@@ -4,10 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
+#include "Engine/DataTable.h"
 #include "UnitPawn.generated.h"
 
 class ATileActor;
 class AArmyPawn;
+class AItemActor;
 
 UENUM(BlueprintType)
 enum class EUnitSide : uint8
@@ -25,6 +27,29 @@ enum class EUnitState : uint8
 	SELECTED	UMETA(Displayname = "Selected"), //Unit is selected (Should show move range.)
 	MOVED		UMETA(Displayname = "Moved"), //Unit has moved to selected destination. (Should only show attack range.)
 	WAIT		UMETA(Displayname = "Wait") //Unit has finished action for turn.
+};
+
+USTRUCT(BlueprintType)
+struct FCombatStats 
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int Health = 1;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int Strength = 1;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int Magic = 1;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int Speed = 1;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int Skill = 1;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int Luck = 1;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int Defense = 1;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int Resistance = 1;
 };
 
 UCLASS()
@@ -80,8 +105,7 @@ public:
 	/// <returns>All tiles the unit can attack.</returns>
 	UFUNCTION(BlueprintCallable)
 	TArray<ATileActor*> GetAttackableTiles(ATileActor* tile);
-
-	
+	bool CanAttackUnit(AUnitPawn* target);
 
 	UFUNCTION(BlueprintCallable)
 	bool IsOpposing(AUnitPawn* target);
@@ -89,21 +113,41 @@ public:
 
 
 public:
+	UPROPERTY(BlueprintReadWrite)
+	int CurrentHealth = 1;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FCombatStats CombatStats;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int MovementRange = 5;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int MinAttackRange = 1;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int MaxAttackRange = 2;
 
-	TArray<ATileActor*> MovementPath;
+	int GetMHP() { return CombatStats.Health; }
+	int GetStr() { return CombatStats.Strength; }
+	int GetMag() { return CombatStats.Magic; }
+	int GetSpd() { return CombatStats.Speed; }
+	int GetSkl() { return CombatStats.Skill; }
+	int GetLck() { return CombatStats.Luck; }
+	int GetDef() { return CombatStats.Defense; }
+	int GetRes() { return CombatStats.Resistance; }
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	AItemActor* EquippedItem;
+
+	TArray<AItemActor*> Inventory;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	EUnitSide Affiliation;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	EUnitState CurrentState;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool ShouldUpdateRange = true;
+	TArray<ATileActor*> MovementPath;
+public:
+	virtual bool IsAirborne() { return false; }
+public:
+	virtual void OnAttacking(AUnitPawn* defendingUnit);
+	virtual void OnDefeated(AUnitPawn* attackingUnit);
+	virtual int TakeDamage(AUnitPawn* attackingUnit, int attack, int defense);
+
+private:
+
 };

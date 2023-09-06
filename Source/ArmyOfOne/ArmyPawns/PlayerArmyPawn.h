@@ -57,8 +57,14 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	AActor* TracedActor = nullptr;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* Camera;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	class USpringArmComponent* CameraBoom;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Camera)
+	class UStaticMeshComponent* PlayerCursor;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Units)
 	AUnitPawn* SelectedUnit;
@@ -67,6 +73,11 @@ public:
 	ATileActor* SelectedTile;
 
 	bool ShouldUpdateRange = true;
+	UPROPERTY(BlueprintReadWrite)
+	bool UsingMouse = true;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float Senitivity = 0.9f;
 public:
 	virtual void TraceForActor(const FVector& start, const FVector& end, bool DrawDebugHelpers);
 

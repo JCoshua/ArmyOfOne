@@ -45,6 +45,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class AUnitPawn* Unit;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int AvoidBonus = 0;
 public:
 	TArray<ATileActor*> GetAdjectentTiles(bool includeCorners = false);
 	UFUNCTION(BlueprintCallable)
