@@ -6,7 +6,7 @@
 #include "ArmyPawn.h"
 #include "PlayerArmyPawn.generated.h"
 
-class ATileActor;
+class AMapTileActor;
 
 UCLASS()
 class ARMYOFONE_API APlayerArmyPawn : public AArmyPawn
@@ -67,10 +67,10 @@ public:
 	class UStaticMeshComponent* PlayerCursor;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Units)
-	AUnitPawn* SelectedUnit;
+	AUnitActor* SelectedUnit;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Units)
-	ATileActor* SelectedTile;
+	AMapTileActor* SelectedTile;
 
 	bool ShouldUpdateRange = true;
 	UPROPERTY(BlueprintReadWrite)

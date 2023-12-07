@@ -2,7 +2,7 @@
 
 
 #include "ArmyPawn.h"
-#include <ArmyOfOne/UnitPawn.h>
+#include <ArmyOfOne/UnitData/UnitActor.h>
 
 // Sets default values
 AArmyPawn::AArmyPawn()
@@ -33,13 +33,13 @@ void AArmyPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 }
 
-bool AArmyPawn::AddUnitToSide(AUnitPawn* unitToAdd)
+bool AArmyPawn::AddUnitToSide(AUnitActor* unitToAdd)
 {
 	if (!unitToAdd)
 		return false;
 
 	Units.Add(unitToAdd);
-	unitToAdd->UnitOwner = this;
+	//unitToAdd->UnitOwner = this;
 
 	return true;
 }
@@ -55,7 +55,7 @@ bool AArmyPawn::AllUnitsMoved()
 	return false;
 }
 
-bool AArmyPawn::IsOwner(AUnitPawn* unit)
+bool AArmyPawn::IsOwner(AUnitActor* unit)
 {
 	return Units.Contains(unit);
 }

@@ -6,7 +6,7 @@
 #include "GameFramework/Pawn.h"
 #include "ArmyPawn.generated.h"
 
-class AUnitPawn;
+class AUnitActor;
 
 UCLASS()
 class ARMYOFONE_API AArmyPawn : public APawn
@@ -30,15 +30,15 @@ public:
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Units)
-	TArray<AUnitPawn*> Units;
+	TArray<AUnitActor*> Units;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Units)
 	class AMapManager* MapData;
 
 public:
-	virtual bool AddUnitToSide(AUnitPawn* unitToAdd);
+	virtual bool AddUnitToSide(AUnitActor* unitToAdd);
 
 	virtual bool AllUnitsMoved();
 
-	virtual bool IsOwner(AUnitPawn* unit);
+	virtual bool IsOwner(AUnitActor* unit);
 };

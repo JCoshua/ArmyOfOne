@@ -35,6 +35,21 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MapData")
+	uint8 MapSizeX = 1;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MapData")
+	uint8 MapSizeY = 1;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "MapData")
+	TArray<AMapTileActor*> GridMap;
+
+	UFUNCTION(BlueprintCallable, CallInEditor, Category = "MapData")
+	void GenerateMap();
+
+	class AMapTileActor* CreateNewTile();
+	
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<AArmyPawn*> sides;
@@ -44,18 +59,9 @@ public:
 
 	bool ResetUnitPhase(EUnitPhase units);
 public:
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	TArray<ATileActor*> GridMap;
 
 	UFUNCTION(BlueprintCallable)
-	void AddTileToGrid(ATileActor* newTile);
-	/// <summary>
-	/// Normalizes the grid so the starting index is 0,0.
-	/// </summary>
-	void NormalizeGridIndex();
-
-	UFUNCTION(BlueprintCallable)
-	ATileActor* GetTile(int x, int y);
+	AMapTileActor* GetTile(int x, int y);
 
 	UFUNCTION(BlueprintCallable, CallInEditor)
 	void RemoveEmptyGrids();

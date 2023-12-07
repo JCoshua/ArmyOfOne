@@ -14,7 +14,6 @@ class ARMYOFONE_API ATileActor : public AActor
 public:	
 	// Sets default values for this actor's properties
 	ATileActor();
-	~ATileActor();
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -24,28 +23,28 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 public:
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category="Visiblity")
 	UStaticMeshComponent* TileMesh;
 
 	//Used to show unit movement.
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Visiblity")
 	UStaticMeshComponent* MovementMesh;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "MapData")
 	int VerticalIndex = 0;
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "MapData")
 	int HorizontalIndex = 0;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "MapData")
 	class AMapManager* MapData;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, Category = "MapData")
+	class AUnitActor* Unit;
+
+	UPROPERTY(EditAnywhere, Category = "TileData")
 	int MovementCost = 1;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	class AUnitPawn* Unit;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TileData")
 	int AvoidBonus = 0;
 public:
 	TArray<ATileActor*> GetAdjectentTiles(bool includeCorners = false);

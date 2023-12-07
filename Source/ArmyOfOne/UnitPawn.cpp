@@ -2,11 +2,10 @@
 
 
 #include "UnitPawn.h"
-#include "TileActor.h"
+#include "MapData/MapTileActor.h"
 #include "MapData/MapManager.h"
 #include "ArmyPawns/PlayerArmyPawn.h"
 #include "ItemData/WeaponActor.h"
-#include "BattleManagers/BattleManager.h"
 
 // Sets default values
 AUnitPawn::AUnitPawn()
@@ -29,26 +28,26 @@ void AUnitPawn::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if(CurrentTile)
-		SetActorLocation(FMath::Lerp(GetActorLocation(), CurrentTile->GetActorLocation() + FVector(0, 0, 25.0f), 0.1f));
-	if (MovementPath.Num() > 0)
-	{
-		CurrentTile->Unit = nullptr;
-		CurrentTile = MovementPath[0];
-		if (FVector::Dist2D(GetActorLocation(), CurrentTile->GetActorLocation()) < 5.0f)
-		{
-			MovementPath.Remove(CurrentTile);
-			CurrentTile->Unit = this;
+	//if(CurrentTile)
+	//	SetActorLocation(FMath::Lerp(GetActorLocation(), CurrentTile->GetActorLocation() + FVector(0, 0, 25.0f), 0.1f));
+	//if (MovementPath.Num() > 0)
+	//{
+	//	CurrentTile->Unit = nullptr;
+	//	CurrentTile = MovementPath[0];
+	//	if (FVector::Dist2D(GetActorLocation(), CurrentTile->GetActorLocation()) < 5.0f)
+	//	{
+	//		MovementPath.Remove(CurrentTile);
+	//		//CurrentTile->Unit = this;
 
-			if (MovementPath.Num() == 0)
-			{
-				CurrentState = EUnitState::MOVED;
-				APlayerArmyPawn* player = Cast<APlayerArmyPawn>(UnitOwner);
-				if(player)
-					player->ShouldUpdateRange = true;
-			}
-		}
-	}
+	//		if (MovementPath.Num() == 0)
+	//		{
+	//			CurrentState = EPawnState::MOVED;
+	//			APlayerArmyPawn* player = Cast<APlayerArmyPawn>(UnitOwner);
+	//			if(player)
+	//				player->ShouldUpdateRange = true;
+	//		}
+	//	}
+	//}
 }
 
 bool AUnitPawn::MoveTile(int xDir, int yDir)
@@ -56,38 +55,38 @@ bool AUnitPawn::MoveTile(int xDir, int yDir)
 	if (!CurrentTile)
 		return false;
 
-	int x = CurrentTile->HorizontalIndex + xDir;
-	int y = CurrentTile->VerticalIndex + yDir;
+	//int x = CurrentTile->HorizontalIndex + xDir;
+	//int y = CurrentTile->VerticalIndex + yDir;
 
-	if (ATileActor* newTile = CurrentTile->MapData->GetTile(x,y))
-	{
-		if (newTile->Unit || newTile->MovementCost <= 0)
-			return false;
+	//if (AMapTileActor* newTile = CurrentTile->MapData->GetTile(x,y))
+	//{
+	//	if (newTile->Unit || newTile->MovementCost <= 0)
+	//		return false;
 
-		newTile->Unit = this;
-		CurrentTile->Unit = nullptr;
-		CurrentTile = newTile;
+	//	//newTile->Unit = this;
+	//	CurrentTile->Unit = nullptr;
+	//	CurrentTile = newTile;
 
-		return true;
-	}
+	//	return true;
+	//}
 
 	return false;
 }
 
 bool AUnitPawn::MoveToTile(int x, int y)
 {
-	if (!CurrentTile || !CurrentTile->MapData)
+	/*if (!CurrentTile || !CurrentTile->MapData)
 		return false;
 
-	ATileActor* target = CurrentTile->MapData->GetTile(x, y);
+	AMapTileActor* target = CurrentTile->MapData->GetTile(x, y);
 	if (!target)
 		return false;
 
-	MovementPath = AMapManager::GetShortestPath(CurrentTile, target);
+	MovementPath = AMapManager::GetShortestPath(CurrentTile, target);*/
 
 	if (MovementPath.Num() == 0)
 	{
-		CurrentState = EUnitState::MOVED;
+		CurrentState = EPawnState::MOVED;
 		APlayerArmyPawn* player = Cast<APlayerArmyPawn>(UnitOwner);
 		if (player)
 			player->ShouldUpdateRange = true;
@@ -97,13 +96,13 @@ bool AUnitPawn::MoveToTile(int x, int y)
 
 bool AUnitPawn::MoveToTile(ATileActor* target)
 {
-	if (!CurrentTile || !CurrentTile->MapData || !target)
+	//if (!CurrentTile || !CurrentTile->MapData || !target)
 		return false;
 	
 	MovementPath = AMapManager::GetShortestPath(CurrentTile, target);
 
 	if (MovementPath.Num() == 0)
-		CurrentState = EUnitState::MOVED;
+		CurrentState = EPawnState::MOVED;
 	return true;
 }
 
@@ -118,16 +117,16 @@ TArray<ATileActor*> AUnitPawn::GetAllTilesInRange()
 	while (tilesToCheck.Num() > 0)
 	{
 		current = tilesToCheck[0];
-		TArray<ATileActor*> adj = current->GetAdjectentTiles();
-		for (int i = 0; i < adj.Num(); i++)
-		{
-			if(!ret.Contains(adj[i]) && !tilesToCheck.Contains(adj[i]))
-				if (AMapManager::GetSmallestDistance(CurrentTile, adj[i], true) <= MovementRange)
-				{
-					if(!adj[i]->Unit || !IsOpposing(adj[i]->Unit))
-						tilesToCheck.AddUnique(adj[i]);
-				}
-		}
+		//TArray<ATileActor*> adj = current->GetAdjectentTiles();
+		//for (int i = 0; i < adj.Num(); i++)
+		//{
+		//	if(!ret.Contains(adj[i]) && !tilesToCheck.Contains(adj[i]))
+		//		if (AMapManager::GetSmallestDistance(CurrentTile, adj[i], true) <= MovementRange)
+		//		{
+		//			//if(!adj[i]->Unit || !IsOpposing(adj[i]->Unit))
+		//				tilesToCheck.AddUnique(adj[i]);
+		//		}
+		//}
 
 		ret.Add(current);
 		tilesToCheck.Remove(current);
@@ -144,14 +143,14 @@ TArray<ATileActor*> AUnitPawn::GetAttackableTiles()
 TArray<ATileActor*> AUnitPawn::GetAttackableTiles(ATileActor* tile)
 {
 	TArray<ATileActor*> ret;
-	TArray<ATileActor*> allTiles = tile->GetTilesInRange(1);
+	/*TArray<ATileActor*> allTiles = tile->GetTilesInRange(1);
 	TArray<ATileActor*> minTiles = tile->GetTilesInRange(1 - 1);
 
 	for (int i = 0; i < allTiles.Num(); i++)
 	{
 		if(!minTiles.Contains(allTiles[i]))
 			ret.Add(allTiles[i]);
-	}
+	}*/
 
 	return ret;
 }
@@ -174,39 +173,28 @@ AMapManager* AUnitPawn::GetMap()
 	return UnitOwner->MapData;
 }
 
-bool AUnitPawn::IsOpposing(AUnitPawn* target)
-{
-	if (Affiliation == EUnitSide::PLAYER || Affiliation == EUnitSide::ALLY)
-		return target->Affiliation != EUnitSide::PLAYER && target->Affiliation != EUnitSide::ALLY;
-
-	return	Affiliation != target->Affiliation;
-}
-
-bool AUnitPawn::IsOpposing()
-{
-	return 	Affiliation != EUnitSide::PLAYER && Affiliation != EUnitSide::ALLY;
-}
+//bool AUnitPawn::IsOpposing(AUnitPawn* target)
+//{
+//	if (Affiliation == EUnitSide::PLAYER || Affiliation == EUnitSide::ALLY)
+//		return target->Affiliation != EUnitSide::PLAYER && target->Affiliation != EUnitSide::ALLY;
+//
+//	return	Affiliation != target->Affiliation;
+//}
+//
+//bool AUnitPawn::IsOpposing()
+//{
+//	return 	Affiliation != EUnitSide::PLAYER && Affiliation != EUnitSide::ALLY;
+//}
 
 void AUnitPawn::OnAttacking(AUnitPawn* defendingUnit)
 {
-	UBattleManager::PerformBattle(this, defendingUnit);
+	if (CurrentHealth <= 0)
+		OnDefeated(defendingUnit);
+	else if (defendingUnit->CurrentHealth <= 0)
+		defendingUnit->OnDefeated(this);
 }
 
 void AUnitPawn::OnDefeated(AUnitPawn* attackingPawn)
 {
 	Destroy();
-}
-
-int AUnitPawn::TakeDamage(AUnitPawn* attackingUnit, int attack, int defense)
-{
-	if (defense > attack)
-		return 0;
-
-	int dmg = attack - defense;
-
-	if (dmg < 0)
-		dmg = 0;
-
-	CurrentHealth -= dmg;
-	return dmg;
 }

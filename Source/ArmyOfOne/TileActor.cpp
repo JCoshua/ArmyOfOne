@@ -4,7 +4,7 @@
 #include "TileActor.h"
 #include "MapData/MapManager.h"
 #include <Components/StaticMeshComponent.h>
-#include "UnitPawn.h"
+#include "UnitData/UnitActor.h"
 
 // Sets default values
 ATileActor::ATileActor()
@@ -17,14 +17,6 @@ ATileActor::ATileActor()
 
 	MovementMesh = CreateDefaultSubobject<UStaticMeshComponent>("Movement Mesh");
 	MovementMesh->SetupAttachment(RootComponent);
-}
-
-ATileActor::~ATileActor()
-{
-	if (MapData)
-	{
-		MapData->GridMap.Remove(this);
-	}
 }
 
 // Called when the game starts or when spawned
@@ -46,18 +38,18 @@ TArray<ATileActor*> ATileActor::GetAdjectentTiles(bool includeCorners /*= false*
 	TArray<ATileActor*> ret;
 
 	//Add all adjecent tiles
-	if(includeCorners)
-		adj.Add(MapData->GetTile(HorizontalIndex + 1, VerticalIndex + 1));
-	adj.Add(MapData->GetTile(HorizontalIndex + 1, VerticalIndex));
-	if (includeCorners)
-		adj.Add(MapData->GetTile(HorizontalIndex - 1, VerticalIndex + 1));
-	adj.Add(MapData->GetTile(HorizontalIndex - 1, VerticalIndex));
-	if (includeCorners)
-		adj.Add(MapData->GetTile(HorizontalIndex + 1, VerticalIndex - 1));
-	adj.Add(MapData->GetTile(HorizontalIndex, VerticalIndex + 1));
-	if (includeCorners)
-		adj.Add(MapData->GetTile(HorizontalIndex - 1, VerticalIndex - 1));
-	adj.Add(MapData->GetTile(HorizontalIndex, VerticalIndex - 1));
+	//if(includeCorners)
+	//	adj.Add(MapData->GetTile(HorizontalIndex + 1, VerticalIndex + 1));
+	//adj.Add(MapData->GetTile(HorizontalIndex + 1, VerticalIndex));
+	//if (includeCorners)
+	//	adj.Add(MapData->GetTile(HorizontalIndex - 1, VerticalIndex + 1));
+	//adj.Add(MapData->GetTile(HorizontalIndex - 1, VerticalIndex));
+	//if (includeCorners)
+	//	adj.Add(MapData->GetTile(HorizontalIndex + 1, VerticalIndex - 1));
+	//adj.Add(MapData->GetTile(HorizontalIndex, VerticalIndex + 1));
+	//if (includeCorners)
+	//	adj.Add(MapData->GetTile(HorizontalIndex - 1, VerticalIndex - 1));
+	//adj.Add(MapData->GetTile(HorizontalIndex, VerticalIndex - 1));
 
 	//Remove any null tiles
 	for (int i = 0; i < adj.Num(); i++)
@@ -76,7 +68,7 @@ TArray<ATileActor*> ATileActor::GetTilesInRange(int range)
 
 	TArray<ATileActor*> ret;
 
-	TArray<ATileActor*> grid = MapData->GridMap;
+	/*TArray<ATileActor*> grid = MapData->GridMap;
 	for (int i = 0; i < grid.Num(); i++)
 	{
 		int xDif = FMath::Abs(grid[i]->HorizontalIndex - HorizontalIndex);
@@ -84,7 +76,7 @@ TArray<ATileActor*> ATileActor::GetTilesInRange(int range)
 
 		if (xDif + yDif <= range)
 			ret.Add(grid[i]);
-	}
+	}*/
 
 	return ret;
 }
