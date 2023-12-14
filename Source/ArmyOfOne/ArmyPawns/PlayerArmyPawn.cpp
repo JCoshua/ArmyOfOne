@@ -29,8 +29,10 @@ void APlayerArmyPawn::BeginPlay()
 {
 	Super::BeginPlay();
 
-	/*if (Units.Num() > 0)
-		SelectedTile = Units[0]->CurrentTile;*/
+	if (Units.Num() > 0)
+		SelectedTile = Units[0]->CurrentTile;
+	else
+		SelectedTile = MapData->GetTile(0, 0);
 }
 
 void APlayerArmyPawn::Tick(float DeltaTime)
@@ -62,11 +64,11 @@ void APlayerArmyPawn::Tick(float DeltaTime)
 			AUnitActor* unit = Cast<AUnitActor>(TracedActor);
 			if (unit)
 			{
-				/*if (SelectedTile != unit->CurrentTile)
+				if (SelectedTile != unit->CurrentTile)
 				{
 					SelectedTile = unit->CurrentTile;
 					ShouldUpdateRange = true;
-				}*/
+				}
 
 			}
 		}
@@ -76,20 +78,20 @@ void APlayerArmyPawn::Tick(float DeltaTime)
 	{
 		if (SelectedUnit)
 		{
-			/*if (SelectedUnit->CurrentState == EUnitState::SELECTED)
+			if (SelectedUnit->CurrentState == EUnitState::SELECTED)
 				ShowMoveRange(SelectedUnit);
 			else if (SelectedUnit->CurrentState == EUnitState::MOVED)
 			{
 				ShowAttackRange(SelectedUnit);
-			}*/
+			}
 			ShouldUpdateRange = false;
 		}
-		//else if (SelectedTile->Unit)
-		//{
-		//	//if (SelectedTile->Unit->CurrentState == EPawnState::READY)
-		//		//ShowMoveRange(SelectedTile->Unit);
-		//	ShouldUpdateRange = false;
-		//}
+		else if (SelectedTile->Unit)
+		{
+			if (SelectedTile->Unit->CurrentState == EUnitState::READY)
+				ShowMoveRange(SelectedTile->Unit);
+			ShouldUpdateRange = false;
+		}
 		else
 			ClearMapRange();
 	}
@@ -200,21 +202,21 @@ void APlayerArmyPawn::SelectTile()
 		{
 			if (SelectedTile->Unit == SelectedUnit)
 				SelectedUnit->CurrentState = EUnitState::MOVED;
-			//else if(SelectedUnit->IsOpposing(SelectedTile->Unit))
+			else if(SelectedUnit->IsOpposing(SelectedTile->Unit))
 			{
 				if (SelectedUnit->CurrentState == EUnitState::SELECTED)
 				{
-					//TArray<ATileActor*> nearbyTiles = SelectedUnit->GetAttackableTiles(SelectedTile);
+					TArray<AMapTileActor*> nearbyTiles = SelectedUnit->GetAttackableTiles(SelectedTile);
 					AMapTileActor* closestTile = SelectedTile;
 
-					/*for (int i = 0; i < nearbyTiles.Num(); i++)
+					for (int i = 0; i < nearbyTiles.Num(); i++)
 					{
 						if (AMapManager::GetSmallestDistance(SelectedUnit->CurrentTile, nearbyTiles[i]) < AMapManager::GetSmallestDistance(SelectedUnit->CurrentTile, closestTile))
 							closestTile = nearbyTiles[i];
-					}*/
+					}
 
-					/*if (AMapManager::GetSmallestDistance(SelectedUnit->CurrentTile, closestTile) <= SelectedUnit->MovementRange)
-						SelectedUnit->MoveToTile(closestTile);*/
+					if (AMapManager::GetSmallestDistance(SelectedUnit->CurrentTile, closestTile) <= SelectedUnit->MovementRange)
+						SelectedUnit->MoveToTile(closestTile);
 				}
 				else if (SelectedUnit->CurrentState == EUnitState::MOVED)
 				{
@@ -232,8 +234,8 @@ void APlayerArmyPawn::SelectTile()
 	}
 	else if(SelectedUnit)
 	{
-		/*if (AMapManager::GetSmallestDistance(SelectedUnit->CurrentTile, SelectedTile) <= SelectedUnit->MovementRange)
-			SelectedUnit->MoveToTile(SelectedTile);*/
+		if (AMapManager::GetSmallestDistance(SelectedUnit->CurrentTile, SelectedTile) <= SelectedUnit->MovementRange)
+			SelectedUnit->MoveToTile(SelectedTile);
 	}
 }
 
@@ -243,14 +245,14 @@ void APlayerArmyPawn::CancelSelection()
 		return;
 
 	SelectedUnit->CurrentState = EUnitState::READY;
-	//SelectedUnit->MovementPath.Empty();
+	SelectedUnit->MovementPath.Empty();
 
-	/*SelectedUnit->CurrentTile->Unit = nullptr;
+	SelectedUnit->CurrentTile->Unit = nullptr;
 	SelectedUnit->StartTile->Unit = SelectedUnit;
 	SelectedUnit->CurrentTile = SelectedUnit->StartTile;
 	SelectedUnit->SetActorLocation(SelectedUnit->StartTile->GetActorLocation() + FVector(0, 0, 25.0f));
 
-	SelectedTile = SelectedUnit->StartTile;*/
+	SelectedTile = SelectedUnit->StartTile;
 	SelectedUnit = nullptr;
 	ShouldUpdateRange = true;
 }
@@ -261,8 +263,8 @@ void APlayerArmyPawn::ClearMapRange()
 
 	for (int i = 0; i < map.Num(); i++)
 	{
-		/*if (map[i]->MovementMesh->GetVisibleFlag())
-			map[i]->MovementMesh->SetVisibility(false);*/
+		if (map[i]->MovementMesh->GetVisibleFlag())
+			map[i]->MovementMesh->SetVisibility(false);
 	}
 }
 
@@ -289,8 +291,8 @@ void APlayerArmyPawn::OnMouseClick()
 	else
 	{
 		AUnitActor* unit = Cast<AUnitActor>(TracedActor);
-		/*if(unit)
-			SelectedTile = unit->CurrentTile;*/
+		if(unit)
+			SelectedTile = unit->CurrentTile;
 	}
 
 	SelectTile();

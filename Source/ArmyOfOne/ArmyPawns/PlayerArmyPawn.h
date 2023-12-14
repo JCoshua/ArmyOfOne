@@ -48,10 +48,10 @@ public:
 	void ClearMapRange();
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
-	void ShowMoveRange(AUnitPawn* unit);
+	void ShowMoveRange(AUnitActor* unit);
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
-	void ShowAttackRange(AUnitPawn* unit);
+	void ShowAttackRange(AUnitActor* unit);
 
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))

@@ -39,7 +39,7 @@ bool AArmyPawn::AddUnitToSide(AUnitActor* unitToAdd)
 		return false;
 
 	Units.Add(unitToAdd);
-	//unitToAdd->UnitOwner = this;
+	unitToAdd->UnitOwner = this;
 
 	return true;
 }

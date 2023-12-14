@@ -6,7 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "MapManager.generated.h"
 
-class ATileActor;
+class AUnitActor;
+class AMapTileActor;
 class AArmyPawn;
 
 UENUM(BlueprintType)
@@ -48,7 +49,7 @@ public:
 	UFUNCTION(BlueprintCallable, CallInEditor, Category = "MapData")
 	void GenerateMap();
 
-	class AMapTileActor* CreateNewTile();
+	AMapTileActor* CreateNewTile();
 	
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -75,7 +76,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	int GetGreatestVerticalIndex();
 
-	static int GetSmallestDistance(ATileActor* start, ATileActor* end, bool pathForUnit = true);
+	static int GetSmallestDistance(AMapTileActor* start, AMapTileActor* end, bool pathForUnit = true);
 
 	/// <summary>
 	/// Creates the shortest path from the starting tile to the end tile.
@@ -83,7 +84,7 @@ public:
 	/// <param name="start">The starting tile.</param>
 	/// <param name="end">The ending tile.</param>
 	/// <returns>The route from start to end.</returns>
-	static TArray<ATileActor*> GetShortestPath(ATileActor* start, ATileActor* end, bool pathForUnit = true);
+	static TArray<AMapTileActor*> GetShortestPath(AMapTileActor* start, AMapTileActor* end, bool pathForUnit = true);
 
 	/// <summary>
 	/// Creates the shortest path from the starting tile to the end tile, treating all tiles movement cost as 1.
@@ -91,5 +92,11 @@ public:
 	/// <param name="start">The starting tile.</param>
 	/// <param name="end">The ending tile.</param>
 	/// <returns>The route from start to end.</returns>
-	static TArray<ATileActor*> GetShortestUnscaledPath(ATileActor* start, ATileActor* end, bool pathForUnit = true);
+	static TArray<AMapTileActor*> GetShortestUnscaledPath(AMapTileActor* start, AMapTileActor* end, bool pathForUnit = true);
+
+public:
+	static TArray<AMapTileActor*> GetTilesInRange(AMapTileActor* start, int range, bool ignoreUnits = true);
+	static TArray<AMapTileActor*> GetTilesInRange(AUnitActor* start, int range, bool ignoreUnits = false);
+
+	static int GetDistance(AMapTileActor* start, AMapTileActor* end);
 };

@@ -6,7 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "UnitActor.generated.h"
 
-class ATileActor;
+class AMapTileActor;
 
 UENUM(BlueprintType)
 enum class EUnitSide : uint8
@@ -113,15 +113,67 @@ public:
 	int GetRes() { return CombatStats.Resistance; }
 
 public:
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Movement")
-	//ATileActor* CurrentTile;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Movement")
+	AMapTileActor* CurrentTile;
 
 	//Used to reset the unit after canceling action, also used to check if unit had moved.
-	//ATileActor* StartTile;
+	AMapTileActor* StartTile;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	EUnitSide Affiliation;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Movement")
 	EUnitState CurrentState;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
+	class AArmyPawn* UnitOwner;
+
+	TArray<AMapTileActor*> MovementPath;
+
+public:
+	UFUNCTION(BlueprintCallable, Category = "Movement")
+	virtual bool MoveTile(int xDir, int yDir);
+
+	UFUNCTION(BlueprintCallable, Category = "Movement")
+	virtual bool MoveToTile(int x, int y);
+	virtual bool MoveToTile(AMapTileActor* target);
+public:
+	UFUNCTION(BlueprintCallable, Category = "Movement")
+	TArray<AMapTileActor*> GetAllTilesInRange();
+
+	/// <summary>
+	/// Gets all tiles within unit's range from current tile.
+	/// </summary>
+	/// <returns>All tiles the unit can attack.</returns>
+	TArray<AMapTileActor*> GetAttackableTiles();
+
+	/// <summary>
+	/// Gets all tiles within unit's range from given tile.
+	/// </summary>
+	/// <param name="tile">The tile to attack from.</param>
+	/// <returns>All tiles the unit can attack.</returns>
+	UFUNCTION(BlueprintCallable, Category ="MapQuery")
+	TArray<AMapTileActor*> GetAttackableTiles(AMapTileActor* tile);
+
+	bool CanAttackUnit(AUnitActor* target);
+
+public:
+	bool IsAirborne() { return false; }
+
+	/// <summary>
+	/// Check whether this unit opposes the target.
+	/// </summary>
+	/// <param name="target">The target unit.</param>
+	/// <returns>True if this unit and the target units are hostile to each other.</returns>
+	UFUNCTION(BlueprintCallable)
+	bool IsOpposing(AUnitActor* target);
+
+	/// <summary>
+	/// Checks whether this unit opposes the player
+	/// </summary>
+	/// <returns>True if this unit is not controlled by the player or an allied unit. False otherwise.</returns>
+	bool IsOpposing();
+private:
+	class AMapManager* GetMap();
 };
